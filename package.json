@@ -38,7 +38,6 @@
     "lint": "npm run lint:js",
     "lint:js": "eslint --ext .js,.jsx .",
     "pack": "NODE_ENV=production webpack --config node_modules/terra-dev-site/config/webpack/webpack.config.js -p",
-    "prepare": "npm run build",
     "prepublishOnly": "npm test",
     "start": "tt-serve",
     "start-static": "tt-serve-static",
@@ -57,21 +56,5 @@
     "rimraf": "^2.6.2",
     "tar": "^4.4.6",
     "tmp": "0.0.33"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.24.1",
-    "babel-jest": "^21.0.0",
-    "babel-plugin-transform-object-assign": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-plugin-transform-regenerator": "^6.24.1",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^4.19.1",
-    "eslint-config-terra": "^1.0.0",
-    "jest": "^21.0.2",
-    "orion-toolkit-js": "^3.2.0",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
-    "terra-dev-site": "^2.1.0"
   }
 }
