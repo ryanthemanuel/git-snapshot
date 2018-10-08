@@ -49,6 +49,7 @@ const extractPackagePromise = prepareFile => (
     tar.extract({
       file: prepareFile,
       cwd: temporaryDirectoryPath,
+      strip: 1,
     }).then(() => removePrepareFile(prepareFile).then(() => Promise.resolve(temporaryDirectoryPath))).catch(error => removePrepareFile(prepareFile).then(() => Promise.reject(error)).catch(() => Promise.reject(error)))
   ))
 );
