@@ -7,9 +7,9 @@ commander
   .parse(process.argv);
 
 gitSnapshot()
-  .then((result) => {
+  .then(() => {
     // eslint-disable-next-line no-console
-    console.log('Successfully snapshotted', result);
+    console.log('Successfully snapshotted');
   })
   .catch((error) => {
     process.exitCode = 1;

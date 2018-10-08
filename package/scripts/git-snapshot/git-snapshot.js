@@ -8,8 +8,8 @@ const gitBranch = require('git-branch');
 
 const preparePromise = () => (
   new Promise((resolve, reject) => {
-    npm.load(() => (
-      npm.commands.pack([process.cwd()], { silent: true, progress: false }, (error, response) => {
+    npm.load({ silent: true, progress: false }, () => (
+      npm.commands.pack([process.cwd()], (error, response) => {
         if (error) {
           reject(error);
         } else {
