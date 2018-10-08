@@ -5,10 +5,11 @@ const fs = require('fs');
 const rimraf = require('rimraf');
 const ghPages = require('gh-pages');
 const gitBranch = require('git-branch');
+const path = require('path');
 
 const preparePromise = () => (
   new Promise((resolve, reject) => {
-    npm.load(() => (
+    npm.load({ loglevel: 'silent', progress: false }, () => (
       npm.commands.pack([process.cwd()], (error, response) => {
         if (error) {
           reject(error);
@@ -22,11 +23,11 @@ const preparePromise = () => (
 
 const temporaryDirectoryPromise = () => (
   new Promise((resolve, reject) => {
-    tmp.dir({ dir: process.cwd() }, (error, path) => {
+    tmp.dir({ dir: process.cwd() }, (error, temporaryDirectoryPath) => {
       if (error) {
         reject(resolve);
       } else {
-        resolve(path);
+        resolve(temporaryDirectoryPath);
       }
     });
   })
@@ -44,12 +45,41 @@ const removePrepareFile = prepareFile => (
   })
 );
 
+const modifyPackageJsonPromise = (temporaryDirectoryPath) => {
+  const packageJsonPath = path.join(temporaryDirectoryPath, 'package.json');
+  return () => new Promise((resolve, reject) => {
+    fs.readFile(packageJsonPath, (error, content) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(content);
+      }
+    });
+  }).then(content => (
+    new Promise((resolve, reject) => {
+      const jsonContent = JSON.parse(content);
+      if (jsonContent.scripts && jsonContent.scripts.prepare) {
+        jsonContent.scripts.prepare = undefined;
+      }
+      jsonContent.devDependencies = undefined;
+      fs.writeFile(packageJsonPath, JSON.stringify(jsonContent, null, 2), (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
+      });
+    })
+  ));
+};
+
 const extractPackagePromise = prepareFile => (
   temporaryDirectoryPromise().then(temporaryDirectoryPath => (
     tar.extract({
       file: prepareFile,
       cwd: temporaryDirectoryPath,
-    }).then(() => removePrepareFile(prepareFile).then(() => Promise.resolve(temporaryDirectoryPath))).catch(error => removePrepareFile(prepareFile).then(() => Promise.reject(error)).catch(() => Promise.reject(error)))
+      strip: 1,
+    }).then(modifyPackageJsonPromise(temporaryDirectoryPath)).then(() => removePrepareFile(prepareFile).then(() => Promise.resolve(temporaryDirectoryPath))).catch(error => removePrepareFile(prepareFile).then(() => Promise.reject(error)).catch(() => Promise.reject(error)))
   ))
 );
 
