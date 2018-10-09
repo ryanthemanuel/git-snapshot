@@ -10,12 +10,17 @@ const path = require('path');
 const preparePromise = () => (
   new Promise((resolve, reject) => {
     npm.load({ loglevel: 'silent', progress: false }, () => (
-      npm.commands.pack([process.cwd()], (error, response) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(response[0].filename);
+      npm.commands.install([process.cwd()], (installError) => {
+        if (installError) {
+          reject(installError);
         }
+        npm.commands.pack([process.cwd()], (packError, packResponse) => {
+          if (packError) {
+            reject(packError);
+          } else {
+            resolve(packResponse[0].filename);
+          }
+        });
       })
     ));
   })
@@ -25,8 +30,9 @@ const temporaryDirectoryPromise = () => (
   new Promise((resolve, reject) => {
     tmp.dir((error, temporaryDirectoryPath) => {
       if (error) {
-        reject(resolve);
+        reject(error);
       } else {
+        console.log(temporaryDirectoryPath);
         resolve(temporaryDirectoryPath);
       }
     });
@@ -93,15 +99,16 @@ const extractPackagePromise = prepareFile => (
 );
 
 const removeTemporaryDirectoryPromise = temporaryDirectoryPath => (
-  new Promise((resolve, reject) => {
-    rimraf(temporaryDirectoryPath, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
-    });
-  })
+  console.log(temporaryDirectoryPath)
+  // new Promise((resolve, reject) => {
+  //   rimraf(temporaryDirectoryPath, (error) => {
+  //     if (error) {
+  //       reject(error);
+  //     } else {
+  //       resolve();
+  //     }
+  //   });
+  // })
 );
 
 const ghPagesPromise = temporaryDirectoryPath => (
