@@ -28,7 +28,7 @@ const preparePromise = () => (
 
 const temporaryDirectoryPromise = () => (
   new Promise((resolve, reject) => {
-    tmp.dir((error, temporaryDirectoryPath) => {
+    tmp.dir({ unsafeCleanup: true }, (error, temporaryDirectoryPath) => {
       if (error) {
         reject(error);
       } else {
