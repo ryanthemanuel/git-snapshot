@@ -5,24 +5,27 @@ const fs = require('fs');
 const ghPages = require('gh-pages');
 const gitBranch = require('git-branch');
 const path = require('path');
+const { exec } = require('child_process');
 
 const preparePromise = () => (
   new Promise((resolve, reject) => {
-    npm.load({ loglevel: 'silent', progress: false }, () => (
-      npm.commands.install([process.cwd()], (installError) => {
-        if (installError) {
-          reject(installError);
-        }
-        npm.commands.pack([process.cwd()], (packError, packResponse) => {
-          if (packError) {
-            reject(packError);
-          } else {
-            resolve(packResponse[0].filename);
-          }
-        });
-      })
-    ));
-  })
+    exec('npm install --loglevel=silent --progress=false', { cwd: process.cwd() }, (error, stdout) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
+      }
+    });
+  }).then(() => new Promise((resolve, reject) => {
+    exec('npm pack --loglevel=silent --progress=false', { cwd: process.cwd() }, (error, stdout) => {
+      if (error) {
+        console.log(error);
+        reject(error);
+      } else {
+        resolve(stdout.trim());
+      }
+    });
+  }))
 );
 
 const temporaryDirectoryPromise = () => (
