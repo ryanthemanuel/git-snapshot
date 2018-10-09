@@ -23,10 +23,11 @@ const preparePromise = () => (
 
 const temporaryDirectoryPromise = () => (
   new Promise((resolve, reject) => {
-    tmp.dir({ dir: process.cwd() }, (error, temporaryDirectoryPath) => {
+    tmp.dir({}, (error, temporaryDirectoryPath) => {
       if (error) {
         reject(resolve);
       } else {
+        console.log(temporaryDirectoryPath);
         resolve(temporaryDirectoryPath);
       }
     });
@@ -75,11 +76,20 @@ const modifyPackageJsonPromise = (temporaryDirectoryPath) => {
 
 const extractPackagePromise = prepareFile => (
   temporaryDirectoryPromise().then(temporaryDirectoryPath => (
-    tar.extract({
-      file: prepareFile,
-      cwd: temporaryDirectoryPath,
-      strip: 1,
-    }).then(modifyPackageJsonPromise(temporaryDirectoryPath)).then(() => removePrepareFile(prepareFile).then(() => Promise.resolve(temporaryDirectoryPath))).catch(error => removePrepareFile(prepareFile).then(() => Promise.reject(error)).catch(() => Promise.reject(error)))
+    tar.extract({ file: prepareFile, cwd: temporaryDirectoryPath, strip: 1 })
+      .then(modifyPackageJsonPromise(temporaryDirectoryPath))
+      .then(() => (
+        removePrepareFile(prepareFile).then(() => (
+          Promise.resolve(temporaryDirectoryPath)
+        ))
+      ))
+      .catch(error => (
+        removePrepareFile(prepareFile).then(() => (
+          Promise.reject(error)
+        )).catch(() => (
+          Promise.reject(error)
+        ))
+      ))
   ))
 );
 
