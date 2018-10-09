@@ -23,11 +23,10 @@ const preparePromise = () => (
 
 const temporaryDirectoryPromise = () => (
   new Promise((resolve, reject) => {
-    tmp.dir({}, (error, temporaryDirectoryPath) => {
+    tmp.dir((error, temporaryDirectoryPath) => {
       if (error) {
         reject(resolve);
       } else {
-        console.log(temporaryDirectoryPath);
         resolve(temporaryDirectoryPath);
       }
     });
