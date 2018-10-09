@@ -31,7 +31,6 @@ const temporaryDirectoryPromise = () => (
       if (error) {
         reject(error);
       } else {
-        console.log(temporaryDirectoryPath);
         resolve(temporaryDirectoryPath);
       }
     });
