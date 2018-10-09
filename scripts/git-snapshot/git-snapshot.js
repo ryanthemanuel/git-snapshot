@@ -2,7 +2,6 @@ const npm = require('npm');
 const tar = require('tar');
 const tmp = require('tmp');
 const fs = require('fs');
-const rimraf = require('rimraf');
 const ghPages = require('gh-pages');
 const gitBranch = require('git-branch');
 const path = require('path');
@@ -98,27 +97,16 @@ const extractPackagePromise = prepareFile => (
   ))
 );
 
-const removeTemporaryDirectoryPromise = temporaryDirectoryPath => (
-  console.log(temporaryDirectoryPath)
-  // new Promise((resolve, reject) => {
-  //   rimraf(temporaryDirectoryPath, (error) => {
-  //     if (error) {
-  //       reject(error);
-  //     } else {
-  //       resolve();
-  //     }
-  //   });
-  // })
-);
-
 const ghPagesPromise = temporaryDirectoryPath => (
   gitBranch().then(name => (
-    ghPages.publish(temporaryDirectoryPath, { branch: `${name}-git-snapshot` }, (error) => {
-      if (error) {
-        return removeTemporaryDirectoryPromise(temporaryDirectoryPath).then(() => Promise.reject(error)).catch(() => Promise.reject(error));
-      }
-      return removeTemporaryDirectoryPromise(temporaryDirectoryPath);
-    })
+    new Promise((resolve, reject) => (
+      ghPages.publish(temporaryDirectoryPath, { branch: `${name}-git-snapshot` }, (error) => {
+        if (error) {
+          reject(error);
+        }
+        resolve();
+      })
+    ))
   ))
 );
 
