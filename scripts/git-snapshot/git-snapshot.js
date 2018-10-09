@@ -1,4 +1,3 @@
-const npm = require('npm');
 const tar = require('tar');
 const tmp = require('tmp');
 const fs = require('fs');
